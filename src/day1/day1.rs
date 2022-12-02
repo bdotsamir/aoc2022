@@ -12,6 +12,7 @@ pub fn main() {
   // println!("{}", inventory);
 
   let inventories_as_strings = inventory.split("\n\n");
+  let mut each_calories: Vec<i32> = Vec::new();
 
   let mut maximum: i32 = 0;
 
@@ -30,12 +31,21 @@ pub fn main() {
     if total > maximum {
       maximum = total;
     }
+
+    each_calories.push(total);
   }
 
   println!("Maximum: {}", maximum);
 
-  // for inventory in inventories {
-  //   println!("Inventory: {}", inventory);
-  // }
+  each_calories.sort_unstable();
+  // see why i used sort_unstable instead of sort here: 
+  // https://stackoverflow.com/a/67707591/8916706
+  each_calories.reverse(); // reverse so it's high to low
+
+  println!("Top three: {:?} {:?} {:?}", 
+  each_calories.get(0), each_calories.get(1), each_calories.get(2));
+  println!("Top three combined: {:?}", 
+  each_calories[0] + each_calories[1] + each_calories[2])
+
 
 }

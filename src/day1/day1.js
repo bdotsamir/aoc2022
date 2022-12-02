@@ -1,14 +1,18 @@
 const { readFileSync } = require('fs');
 
-const fileContents = readFileSync("./inventory.txt").toString();
+const fileContents = readFileSync("./src/day1/inventory.txt").toString();
 
 const inventoryAsNumbers = fileContents.split("\n\n")
   .map(g => g.split("\n").map(g => +g));
 
-let max = 0;
+let totalInventories = [];
 for (const inventory of inventoryAsNumbers) {
   const reduced = inventory.reduce((acc, val) => acc + val);
-  if (reduced > max) max = reduced;
+  totalInventories.push(reduced);
 }
 
-console.log(max);
+totalInventories.sort((a, z) => a - z).reverse();
+
+//console.log(totalInventories.join(", "));
+console.log(totalInventories[0], totalInventories[1], totalInventories[2]);
+console.log(totalInventories[0] + totalInventories[1] + totalInventories[2]);
