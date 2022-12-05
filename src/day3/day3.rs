@@ -5,6 +5,12 @@
 // 4. find the common item's priority
 // 5. sum all common item priorities
 
+// PART 2
+// 1. split by groups of three
+// 2. split each string slice by "" then collect into vecs
+// 3. iterate through second vec to .has() first vec for intersection
+// 4. use intersection to iterate through third vec for .has()
+
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::prelude::*;
@@ -16,55 +22,72 @@ pub fn main() {
     .read_to_string(&mut backpacks_file)
     .expect("Error reading the file");
 
-  let backpacks: Vec<&str> = backpacks_file.split("\n").collect();
+  let backpacks: Vec<String> = backpacks_file.split("\n").map(String::from).collect();
 
-  let mut sum: u16 = 0;
+  let groups_of_three = backpacks.chunks(3);
 
-  for backpack in backpacks {
-    // cant use backpack.len() here because len() returns the bytes, not the
-    // characters. so instead, we use .chars().count();
-    // https://stackoverflow.com/a/46290728/8916706
-    let length = backpack.chars().count();
-    let first_compartment_strs = &backpack[0..length / 2];
-    let second_compartment_strs = &backpack[length / 2..length];
+  let mut common_items: Vec<char> = Vec::new();
 
-    // println!(
-    //     "Backpack: {} (len {length})\nFirst compartment: {}, Second compartment: {}",
-    //     backpack, first_compartment_strs, second_compartment_strs
-    // );
+  for group in groups_of_three {
+    let group: Vec<Vec<&str>> = group.iter().map(|g| g.split("").collect()).collect();
 
-    let mut first_compartment = HashSet::new();
-    first_compartment_strs.split("").for_each(|s| {
-      if s != "" {
-        let c = s.chars().last().unwrap();
-        first_compartment.insert(c);
+    let backpack_one_items = group.get(0).unwrap();
+    let backpack_two_items = group.get(1).unwrap();
+    let backpack_three_items = group.get(2).unwrap();
+
+    let mut backpack_one = HashSet::new();
+    backpack_one_items.iter().for_each(|i| {
+      if i != &"" {
+        backpack_one.insert(i);
       }
     });
-
-    let mut second_compartment = HashSet::new();
-    second_compartment_strs.split("").for_each(|s| {
-      if s != "" {
-        let c = s.chars().last().unwrap();
-        second_compartment.insert(c);
+    let mut backpack_two = HashSet::new();
+    backpack_two_items.iter().for_each(|i| {
+      if i != &"" {
+        backpack_two.insert(i);
       }
     });
+    let mut backpack_three = HashSet::new();
+    backpack_three_items.iter().for_each(|i| {
+      if i != &"" {
+        backpack_three.insert(i);
+      }
+    });
+        
+    let intersection = backpack_one.intersection(&backpack_two);
 
-    let intersection = first_compartment.intersection(&second_compartment);
+    println!("BP1: {backpack_one:?}\nBP2: {backpack_two:?}\nBP3:{backpack_three:?}");
+    println!("intersection of bp1 & 2: {:?}", intersection);
 
-    println!(
-      "{:?}\n{:?}\n{:?}\n{:?}",
-      backpack, first_compartment, second_compartment, intersection
-    );
+    let mut common_item = "";
 
-    let int_as_char_num = parse_char(intersection.last().unwrap().to_owned());
+    for item in intersection {
+      if backpack_three.contains(item) {
+        common_item = item;
+        println!("Found common item between all three backpacks: {item:?}");
+        break;
+      }
+    }
 
-    println!("{int_as_char_num:?}");
+    if common_item == "" {
+      panic!("Did not find a common item!");
+    }
 
-    sum += int_as_char_num;
+    common_items.push(common_item.chars().last().expect("Couldn't find char."));
+    
   }
 
-  println!("Sum: {sum}");
+  let sum = common_items.iter().map(|i| {
+    parse_char(i.to_owned())
+  }).fold(0, |acc, val| acc + val);
 
+  println!("Sum of all priorities: {sum}");
+
+  // println!(
+  //   "First group: {:?}\nLast group: {:?}",
+  //   groups_of_three.get(0).expect("missing first group"),
+  //   groups_of_three.last().expect("missing last group")
+  // )
 }
 
 // A = 65 -> 27
