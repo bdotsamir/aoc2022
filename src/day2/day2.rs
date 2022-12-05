@@ -30,13 +30,13 @@ pub fn main() {
             match opponent_roll {
                 Roll::ROCK => round_score += 6 + roll_to_points(&Roll::PAPER),
                 Roll::PAPER => round_score += 6 + roll_to_points(&Roll::SCISSORS),
-                Roll::SCISSORS => round_score += 6 + roll_to_points(&Roll::ROCK)
+                Roll::SCISSORS => round_score += 6 + roll_to_points(&Roll::ROCK),
             }
         } else if my_need == NeedTo::LOSE {
             match opponent_roll {
                 Roll::ROCK => round_score += 0 + roll_to_points(&Roll::SCISSORS),
                 Roll::PAPER => round_score += 0 + roll_to_points(&Roll::ROCK),
-                Roll::SCISSORS => round_score += 0 + roll_to_points(&Roll::PAPER)
+                Roll::SCISSORS => round_score += 0 + roll_to_points(&Roll::PAPER),
             }
         }
 
@@ -70,7 +70,7 @@ pub fn main() {
 enum Roll {
     ROCK,
     PAPER,
-    SCISSORS
+    SCISSORS,
 }
 
 #[derive(PartialEq)] // this trait allows you to check NeedTos against each other.
@@ -78,7 +78,7 @@ enum Roll {
 enum NeedTo {
     TIE,
     WIN,
-    LOSE
+    LOSE,
 }
 
 fn parse_roll(roll: &str) -> Roll {
@@ -86,7 +86,7 @@ fn parse_roll(roll: &str) -> Roll {
         "A" => Roll::ROCK,
         "B" => Roll::PAPER,
         "C" => Roll::SCISSORS,
-        _ => panic!("Invalid roll: {}", roll)
+        _ => panic!("Invalid roll: {}", roll),
     }
 }
 
@@ -94,7 +94,7 @@ fn roll_to_points(roll: &Roll) -> u16 {
     match roll {
         Roll::ROCK => 1,
         Roll::PAPER => 2,
-        Roll::SCISSORS => 3
+        Roll::SCISSORS => 3,
     }
 }
 
@@ -103,6 +103,6 @@ fn parse_need(letter: &str) -> NeedTo {
         "X" => NeedTo::LOSE,
         "Y" => NeedTo::TIE,
         "Z" => NeedTo::WIN,
-        _ => panic!("Invalid letter! {}", letter)
+        _ => panic!("Invalid letter! {}", letter),
     }
 }
