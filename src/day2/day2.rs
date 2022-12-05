@@ -17,29 +17,45 @@ pub fn main() {
     for round in rounds {
         let split: Vec<&str> = round.split(" ").collect();
         let opponent_roll_str = split.first().unwrap().to_owned();
-        let my_roll_str = split.last().unwrap().to_owned();
+        let my_need_str = split.last().unwrap().to_owned();
 
         let opponent_roll = parse_roll(opponent_roll_str);
-        let my_roll = parse_roll(my_roll_str);
+        let my_need = parse_need(my_need_str);
 
         let mut round_score: u16 = 0;
 
-        if opponent_roll == my_roll { // there was a tie
-            round_score += roll_to_points(&my_roll) + 3;
-            println!("There was a tie! We both rolled: {:?}", my_roll);
-        } else if opponent_roll == Roll::PAPER && my_roll == Roll::SCISSORS {
-            round_score += roll_to_points(&my_roll) + 6; // i won
-            println!("I won! Opponent rolled {:?} and I rolled {:?}", opponent_roll, my_roll);
-        } else if opponent_roll == Roll::SCISSORS && my_roll == Roll::ROCK {
-            round_score += roll_to_points(&my_roll) + 6; // i won
-            println!("I won! Opponent rolled {:?} and I rolled {:?}", opponent_roll, my_roll);
-        } else if opponent_roll == Roll::ROCK && my_roll == Roll::PAPER {
-            round_score += roll_to_points(&my_roll) + 6; // i won
-            println!("I won! Opponent rolled {:?} and I rolled {:?}", opponent_roll, my_roll);
-        } else {
-            round_score += roll_to_points(&my_roll) + 0; // i lost
-            println!("I lost! Opponent rolled {:?} and I rolled {:?}", opponent_roll, my_roll);
+        if my_need == NeedTo::TIE {
+            round_score += 3 + roll_to_points(&opponent_roll);
+        } else if my_need == NeedTo::WIN {
+            match opponent_roll {
+                Roll::ROCK => round_score += 6 + roll_to_points(&Roll::PAPER),
+                Roll::PAPER => round_score += 6 + roll_to_points(&Roll::SCISSORS),
+                Roll::SCISSORS => round_score += 6 + roll_to_points(&Roll::ROCK)
+            }
+        } else if my_need == NeedTo::LOSE {
+            match opponent_roll {
+                Roll::ROCK => round_score += 0 + roll_to_points(&Roll::SCISSORS),
+                Roll::PAPER => round_score += 0 + roll_to_points(&Roll::ROCK),
+                Roll::SCISSORS => round_score += 0 + roll_to_points(&Roll::PAPER)
+            }
         }
+
+        // if opponent_roll == my_roll { // there was a tie
+        //     round_score += roll_to_points(&my_roll) + 3;
+        //     println!("There was a tie! We both rolled: {:?}", my_roll);
+        // } else if opponent_roll == Roll::PAPER && my_roll == Roll::SCISSORS {
+        //     round_score += roll_to_points(&my_roll) + 6; // i won
+        //     println!("I won! Opponent rolled {:?} and I rolled {:?}", opponent_roll, my_roll);
+        // } else if opponent_roll == Roll::SCISSORS && my_roll == Roll::ROCK {
+        //     round_score += roll_to_points(&my_roll) + 6; // i won
+        //     println!("I won! Opponent rolled {:?} and I rolled {:?}", opponent_roll, my_roll);
+        // } else if opponent_roll == Roll::ROCK && my_roll == Roll::PAPER {
+        //     round_score += roll_to_points(&my_roll) + 6; // i won
+        //     println!("I won! Opponent rolled {:?} and I rolled {:?}", opponent_roll, my_roll);
+        // } else {
+        //     round_score += roll_to_points(&my_roll) + 0; // i lost
+        //     println!("I lost! Opponent rolled {:?} and I rolled {:?}", opponent_roll, my_roll);
+        // }
 
         results.push(round_score);
     }
@@ -57,14 +73,19 @@ enum Roll {
     SCISSORS
 }
 
+#[derive(PartialEq)] // this trait allows you to check NeedTos against each other.
+#[derive(Debug)] // this trait allows for println! formatting
+enum NeedTo {
+    TIE,
+    WIN,
+    LOSE
+}
+
 fn parse_roll(roll: &str) -> Roll {
     match roll {
         "A" => Roll::ROCK,
         "B" => Roll::PAPER,
         "C" => Roll::SCISSORS,
-        "X" => Roll::ROCK,
-        "Y" => Roll::PAPER,
-        "Z" => Roll::SCISSORS,
         _ => panic!("Invalid roll: {}", roll)
     }
 }
@@ -74,5 +95,14 @@ fn roll_to_points(roll: &Roll) -> u16 {
         Roll::ROCK => 1,
         Roll::PAPER => 2,
         Roll::SCISSORS => 3
+    }
+}
+
+fn parse_need(letter: &str) -> NeedTo {
+    match letter {
+        "X" => NeedTo::LOSE,
+        "Y" => NeedTo::TIE,
+        "Z" => NeedTo::WIN,
+        _ => panic!("Invalid letter! {}", letter)
     }
 }
